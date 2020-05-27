@@ -1,3 +1,5 @@
+### This is forked repo. everything int he readme from here until 'My Changes' is left as is from the originial repo.
+
 # Hamurabi: Classic BASIC gaming.
 
 An MIT licensed, C99 implementation of the classic BASIC game
