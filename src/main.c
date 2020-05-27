@@ -71,26 +71,21 @@ void printYearlyReport(const uint16_t year,city_st *const cty);
 uint16_t input(void) {
     wrefresh(MAIN_WIN);
     const uint16_t inp_size = 10;
-    char input[inp_size], *endptr;
-    wgetstr(MAIN_WIN,input);
+    char input_str[inp_size], *endptr;
+    wgetstr(MAIN_WIN,input_str);
     errno = 0;
-    const uint16_t q = (uint16_t) strtol(input, &endptr, inp_size);
-    if ((errno == ERANGE && (q == LONG_MAX || q == LONG_MIN)) || (errno != 0 && q == 0)) {
+    const uint16_t q = (uint16_t) strtol(input_str, &endptr, inp_size);                     
+    if ((errno == ERANGE && (q == LONG_MAX || q == LONG_MIN)) || (errno != 0 && q == 0)) {  
         perror("strtol");
-        exit(EXIT_FAILURE);
+        exit(EXIT_FAILURE);   
     }
-    if (endptr == input) {
-        fprintf(stderr, "No digits were found\n");
-        exit(EXIT_FAILURE);
+    if (endptr == input_str) {   //if something other than a number was entered, try again.
+        wprintw(MAIN_WIN, "No digits were found\nplease try again.\n");
+        return input();
     }
     return q;
 }
 
-/*
-   Client functions
-
-   Someday I dream of being in curses.
- */
 void retire() {
     wprintw(MAIN_WIN,"So long for now.\n");
     wrefresh(MAIN_WIN);
@@ -164,12 +159,10 @@ void sellAcres(city_st *const cty) {
     if (inp < 0) {
         storm_out();
     }
-    else if (inp > 0) {
-        if (sell_acres(cty, inp) != 0) {
-            wprintw(MAIN_WIN,"Hamurabi: Think again. You have only %d acres.",acres(cty));
-            wprintw(MAIN_WIN," Now then,\n");
-            return sellAcres(cty);
-        }
+    else if (inp > 0 && sell_acres(cty, inp) != 0) {
+        wprintw(MAIN_WIN,"Hamurabi: Think again. You have only %d acres.",acres(cty));
+        wprintw(MAIN_WIN," Now then,\n");
+        return sellAcres(cty);
     }
 }
 
@@ -180,18 +173,17 @@ void feedPeople(city_st *const cty) {
     if (inp < 0) {
         storm_out();
     }
-    else if (inp > 0) {
-        if (feed_populace(cty, inp) != 0) {
-          wprintw(MAIN_WIN,"Hamurabi: Think again. We only have %d bushels.",bushels(cty));
-          wprintw(MAIN_WIN," Now then,\n");
-          return feedPeople(cty);
-        }
+    else if (inp > 0 && feed_populace(cty, inp) != 0) {
+        wprintw(MAIN_WIN,"Hamurabi: Think again. We only have %d bushels.",bushels(cty));
+        wprintw(MAIN_WIN," Now then,\n");
+        return feedPeople(cty);
     }
 }
 
 void plantSeed(city_st *const cty) {
+    const int max_acres = 10*population(cty);
     wprintw(MAIN_WIN,"How many acres do you wish to plant with seed?\n");
-    wprintw(MAIN_WIN,"(MAX: %d acres)\n", 10*population(cty));
+    wprintw(MAIN_WIN,"(MAX: %d acres)\n", (max_acres <= acres(cty))? max_acres: acres(cty));
     const uint16_t inp = input();
     if (inp < 0) {
         storm_out();
@@ -243,20 +235,18 @@ void gameLoop(void) {
     city_st *cty = new_city_st();
     for (uint16_t year=0; year < 11; year++) {
         printYearlyReport(year,cty);
-        updateInfo(year,cty);
-        wclear(MAIN_WIN);
+        updateScreen(year,cty);
         buyAcres(cty);
         updateScreen(year,cty);
         feedPeople(cty);
-        updateInfo(year,cty);
-        wclear(MAIN_WIN);
+        updateScreen(year,cty);
         plantSeed(cty);
-        updateInfo(year,cty);
-        wclear(MAIN_WIN);
+        updateScreen(year,cty);
         if (step(cty) == ESTARVE) {
             wprintw(MAIN_WIN,"You starved %d people in one year!!!\n",starved(cty));
             ejected();
         }
+        updateScreen(year,cty);
     }
     game_end(cty);
     free_city_st(cty);
@@ -264,6 +254,6 @@ void gameLoop(void) {
 
 int main(void) {
     initScreen();
-    wprintw(MAIN_WIN,"Try your hand at governing Ancient Sumeria\nsuccessfully for a 10 year term of office.\n");
+    wprintw(MAIN_WIN,"Try your hand at governing Ancient Sumeria\nsuccessfully for a 10 year term of office.\n\n");
     gameLoop();
 }
