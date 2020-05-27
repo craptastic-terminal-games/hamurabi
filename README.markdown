@@ -34,3 +34,9 @@ of things I'd readily accept:
 
 If it's not on the list, send me a patch: I'll probably like
 it!
+
+## My Changes (return5)
+  -I added Ncurses functionality to the code. very basic functionality. Instad of running in just terminal, it now runs in an ncurses window. 
+  -I added a window to show information about population,acres,year,and bushles owned
+  -I added a new makefile and removed the one previously there. 
+  -I moved around some of the code in 'main.c'
