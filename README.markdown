@@ -1,4 +1,4 @@
-### This is forked repo. everything int he readme from here until 'My Changes' is left as is from the originial repo.
+### This is a forked repo. everything in the readme after this line and until 'My Changes' is left as is from the originial repo.
 
 # Hamurabi: Classic BASIC gaming.
 
